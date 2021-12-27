@@ -15,7 +15,7 @@ import (
 func main() {
 	location := flag.String("location", "/metrics", "metrics location")
 	listen := flag.String("listen", "0.0.0.0:9141", "address to listen on")
-	timeout := flag.Int64("timeout", 30, "timeout for connection to zk servers, in seconds")
+	timeout := flag.Int64("timeout", 10, "timeout for connection to zk servers, in seconds")
 	zkhosts := flag.String("zk-hosts", "", "comma separated list of zk servers, e.g. '10.0.0.1:2181,10.0.0.2:2181,10.0.0.3:2181'")
 
 	flag.Parse()
