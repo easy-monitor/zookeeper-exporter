@@ -74,7 +74,7 @@ func getMetrics(options *Options) map[string]string {
 			continue
 		}
 
-		res := sendZookeeperCmd(conn, h, "mntr")
+		res := sendZookeeperCmd(conn, h, "mntr", timeout)
 
 		// get slice of strings from response, like 'zk_avg_latency 0'
 		lines := strings.Split(res, "\n")
@@ -124,7 +124,7 @@ func getMetrics(options *Options) map[string]string {
 
 		zkRuok := fmt.Sprintf("zk_ruok{%s}", hostLabel)
 		if conn, err = dialer.Dial("tcp", tcpaddr.String()); err == nil {
-			res = sendZookeeperCmd(conn, h, "ruok")
+			res = sendZookeeperCmd(conn, h, "ruok", timeout)
 			if res == "imok" {
 				metrics[zkRuok] = "1"
 			} else {
@@ -147,8 +147,9 @@ func logNotAllowed(cmd, label string) {
 	log.Printf("warning: %s command isn't allowed at %s, see '4lw.commands.whitelist' ZK config parameter", cmd, label)
 }
 
-func sendZookeeperCmd(conn net.Conn, host, cmd string) string {
+func sendZookeeperCmd(conn net.Conn, host, cmd string, timeout time.Duration) string {
 	defer conn.Close()
+	conn.SetDeadline(time.Now().Add(timeout))
 
 	_, err := conn.Write([]byte(cmd))
 	if err != nil {
